@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/mail"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
 
 	"github.com/bjdean/gonetcheck"
 	"github.com/go-gomail/gomail"
-	"net/mail"
-	"os"
 )
 
 var topic string
@@ -31,9 +31,9 @@ func initFlags() {
 	flag.IntVar(&smtpPort, "port", 587, "smtp port.")
 }
 
-func checkFlags(){
+func checkFlags() {
 	_, err := mail.ParseAddress(targetMail)
-	if err != nil{
+	if err != nil {
 		fmt.Printf("Target email incorrect: '%v'", targetMail)
 		os.Exit(1)
 	}
@@ -81,7 +81,7 @@ func sendEmail(subject, body string) {
 
 func checkInternetConnection() (bool, []error) {
 	return gonetcheck.CheckInternetAccess(
-		time.Duration(60 * time.Second),
+		time.Duration(60*time.Second),
 		[]string{"http://google.com"},
 		[]string{})
 }
@@ -98,14 +98,14 @@ func getSSID() string {
 func main() {
 	initFlags()
 	flag.Parse()
-	checkFlags();
+	checkFlags()
 	hasInternet, _ := checkInternetConnection()
 	if hasInternet {
 		addresses := localAddresses()
 		if addresses != nil {
 			fmt.Printf("%v\n", addresses)
 			sendEmail(fmt.Sprintf("%v - %v (%v)", "RaspberryPi - IP", topic, time.Now().Format("Monday 15:04:05 2-01-2006")), strings.Trim(fmt.Sprintf("%v",
-				addresses), "[]") + fmt.Sprintf("Wireless network: %v", getSSID()))
+				addresses), "[]")+fmt.Sprintf("Wireless network: %v", getSSID()))
 		}
 	}
 }
