@@ -1,0 +1,4 @@
+#!/bin/bash
+
+GOOS=linux GOARCH=arm GOARM=7 go build . && \
+scp ${PWD##*/} pi@$1:~/bin/

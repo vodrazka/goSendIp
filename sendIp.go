@@ -11,6 +11,8 @@ import (
 
 	"github.com/bjdean/gonetcheck"
 	"github.com/go-gomail/gomail"
+	"net/mail"
+	"os"
 )
 
 var topic string
@@ -21,12 +23,20 @@ var username string
 var smtpPort int
 
 func initFlags() {
-	flag.StringVar(&topic, "t", "", "Email subject additional info.")
-	flag.StringVar(&targetMail, "e", "fane.exe@gmail.com", "Target email address.")
+	flag.StringVar(&topic, "topic", "", "Email subject additional info.")
+	flag.StringVar(&targetMail, "target", "", "Target email address.")
 	flag.StringVar(&password, "pass", "password", "Source emial password.")
-	flag.StringVar(&smtpServer, "s", "smtp.mailgun.org", "Address of smtp server.")
-	flag.StringVar(&username, "u", "rasp@sandbox85e310238ee2448888290d9f25179241.mailgun.org", "Source email username.")
+	flag.StringVar(&smtpServer, "smtp", "smtp.mailgun.org", "Address of smtp server.")
+	flag.StringVar(&username, "user", "rasp@sandbox85e310238ee2448888290d9f25179241.mailgun.org", "Source email username.")
 	flag.IntVar(&smtpPort, "port", 587, "smtp port.")
+}
+
+func checkFlags(){
+	_, err := mail.ParseAddress(targetMail)
+	if err != nil{
+		fmt.Printf("Target email incorrect: '%v'", targetMail)
+		os.Exit(1)
+	}
 }
 
 func localAddresses() []string {
@@ -88,6 +98,7 @@ func getSSID() string {
 func main() {
 	initFlags()
 	flag.Parse()
+	checkFlags();
 	hasInternet, _ := checkInternetConnection()
 	if hasInternet {
 		addresses := localAddresses()
